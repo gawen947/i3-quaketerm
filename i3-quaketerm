@@ -26,7 +26,7 @@ import getopt, sys, os
 import i3ipc
 
 # TODO:
-#  - version
+#  - verbose
 #  - usage
 #  - show error details (for example when cannot start cmd)
 #  - page
@@ -69,6 +69,9 @@ def find(i3, name):
         return None
     return term[0]
 
+def version():
+    print("i3-quaketerm v%s" % (VERSION,))
+
 if __name__ == '__main__':
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hVHt:n:N:vp:r:", [ "help", "version", "hidden", "terminal", "name", "name-option", "verbose", "position", "ratio" ])
@@ -85,8 +88,11 @@ if __name__ == '__main__':
     position    = "top"
     ratio       = 0.25
     for o, a in opts:
-        if o == ("-v", "--verbose"):
+        if o in ("-v", "--verbose"):
             verbose = True
+        elif o in ("-V", "--version"):
+            version()
+            sys.exit(0)
         elif o in ("-h", "--help"):
             usage()
             sys.exit(0)
