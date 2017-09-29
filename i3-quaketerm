@@ -32,6 +32,8 @@ import i3ipc
 #  - page
 #  - report i3ipc bug
 
+VERSION="0.1-git"
+
 def show(i3, ws, name, position, ratio):
     x, y = ws["rect"]["x"], ws["rect"]["y"]
     w, h = ws["rect"]["width"], ws["rect"]["height"]
@@ -69,7 +71,7 @@ def find(i3, name):
 
 if __name__ == '__main__':
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hHt:n:N:vp:r:", [ "help", "hidden", "terminal", "name", "name-option", "verbose", "position", "ratio" ])
+        opts, args = getopt.getopt(sys.argv[1:], "hVHt:n:N:vp:r:", [ "help", "version", "hidden", "terminal", "name", "name-option", "verbose", "position", "ratio" ])
     except getopt.GetoptError as e:
         print(str(e))
         usage()
@@ -117,14 +119,12 @@ if __name__ == '__main__':
         if term.workspace().name != focused_ws.name:
             show(i3, focused_ws, name, position, ratio)
     else:
-        def created():
-            hide(i3, name)
-            if not hidden:
-                show(i3, focused_ws, name, position, ratio)
-            sys.exit(0)
         def new_window(self, event):
             if event.container.window_instance == name:
-                created()
+                hide(i3, name)
+                if not hidden:
+                    show(i3, focused_ws, name, position, ratio)
+                sys.exit(0)
         i3.on("window::new", new_window)
 
         pid = os.fork()
