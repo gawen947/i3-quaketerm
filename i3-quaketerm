@@ -1,0 +1,137 @@
+#!/usr/bin/env python3
+#  Copyright (c) 2017, David Hauweele <david@hauweele.net>
+#  All rights reserved.
+#
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions are met:
+#
+#   1. Redistributions of source code must retain the above copyright notice, this
+#      list of conditions and the following disclaimer.
+#   2. Redistributions in binary form must reproduce the above copyright notice,
+#      this list of conditions and the following disclaimer in the documentation
+#      and/or other materials provided with the distribution.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+#  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+#  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+#  ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+#  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+#  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+#  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+import getopt, sys, os
+import i3ipc
+
+# TODO:
+#  - version
+#  - usage
+#  - show error details (for example when cannot start cmd)
+#  - page
+#  - report i3ipc bug
+
+def show(i3, ws, name, position, ratio):
+    x, y = ws["rect"]["x"], ws["rect"]["y"]
+    w, h = ws["rect"]["width"], ws["rect"]["height"]
+
+    h_ = int(h * ratio)
+    if position == "bottom":
+        y = y + h - h_
+    h = h_
+
+    i3.command("[instance=%s],"
+               "resize set %d px %d px,"
+               "move absolute position %d px %d px" % (name, w, h, x, y))
+
+def hide(i3, name):
+    i3.command("[instance=%s] floating enable, move scratchpad" % (name,))
+
+def find_instanced(con, instance, r = []):
+    if con.window_instance == instance:
+        r.append(con)
+
+    for node in con.nodes:
+        find_instanced(node, instance, r)
+    for node in con.floating_nodes:
+        find_instanced(node, instance, r)
+
+    return r
+
+def find(i3, name):
+    tree = i3.get_tree()
+    term = find_instanced(tree, name)
+
+    if len(term) == 0:
+        return None
+    return term[0]
+
+if __name__ == '__main__':
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hHt:n:N:vp:r:", [ "help", "hidden", "terminal", "name", "name-option", "verbose", "position", "ratio" ])
+    except getopt.GetoptError as e:
+        print(str(e))
+        usage()
+        sys.exit(1)
+
+    verbose     = False
+    hidden      = False
+    terminal    = "xterm"
+    name        = "i3-quaketerm"
+    name_option = "-name"
+    position    = "top"
+    ratio       = 0.25
+    for o, a in opts:
+        if o == ("-v", "--verbose"):
+            verbose = True
+        elif o in ("-h", "--help"):
+            usage()
+            sys.exit(0)
+        elif o in ("-H", "--hidden"):
+            hidden = True
+        elif o in ("-t", "--terminal"):
+            terminal = a
+        elif o in ("-n", "--name"):
+            name = a
+        elif o in ("-N", "--name-option"):
+            name_option = a
+        elif o in ("-p", "--position"):
+            position = a
+            if position not in ("top", "bottom"):
+                sys.exit("error: invalid position (use top or bottom)")
+        elif o in ("-r", "--ratio"):
+            try:
+                ratio = float(a)
+            except ValueError:
+                sys.exit("error: invalid ratio")
+        else:
+            assert False, "unhandled option"
+
+    i3 = i3ipc.Connection()
+    focused_ws = [w for w in i3.get_workspaces() if w["focused"]][0]
+
+    term = find(i3, name)
+    if term:
+        hide(i3, name)
+        if term.workspace().name != focused_ws.name:
+            show(i3, focused_ws, name, position, ratio)
+    else:
+        def created():
+            hide(i3, name)
+            if not hidden:
+                show(i3, focused_ws, name, position, ratio)
+            sys.exit(0)
+        def new_window(self, event):
+            if event.container.window_instance == name:
+                created()
+        i3.on("window::new", new_window)
+
+        pid = os.fork()
+        if pid == 0:
+            try:
+                os.execvp(terminal, [terminal, name_option, name])
+            except:
+                sys.exit("error: cannot execute terminal")
+            assert False, "exec failed"
+        i3.main()
