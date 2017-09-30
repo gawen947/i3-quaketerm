@@ -31,7 +31,6 @@ import os
 import i3ipc
 
 # TODO:
-#  - show error details (for example when cannot start cmd)
 #  - page
 #  - report i3ipc bug
 
@@ -182,7 +181,7 @@ if __name__ == '__main__':
         if pid == 0:
             try:
                 os.execvp(terminal, [terminal, name_option, name] + extra_options)
-            except:
-                sys.exit("error: cannot execute terminal")
+            except Exception as e:
+                sys.exit("error: cannot execute terminal: " + str(e))
             assert False, "exec failed"
         i3.main()
