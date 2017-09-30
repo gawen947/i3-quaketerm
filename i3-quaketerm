@@ -91,7 +91,7 @@ if __name__ == '__main__':
         opts, args = getopt.getopt(sys.argv[1:], "hVHt:n:N:vp:r:", [ "help", "version", "hidden", "terminal", "name", "name-option", "verbose", "position", "ratio" ])
     except getopt.GetoptError as e:
         print(str(e))
-        usage()
+        usage(sys.argv[0])
         sys.exit(1)
 
     verbose     = False
