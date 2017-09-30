@@ -28,6 +28,8 @@ import shlex
 import sys
 import os
 
+from collections import deque
+
 import i3ipc
 
 VERSION="0.1-git"
@@ -56,17 +58,17 @@ def find_instanced(con, instance, r = []):
     The find_*() method from i3ipc did not return foating nodes
     correctly. So we reimplemented it here.
     """
-    # TODO: can fail with very deep trees
-    #       should use non-rec exploration instead.
-    if con.window_instance == instance:
-        r.append(con)
+    result = []
 
-    for node in con.nodes:
-        find_instanced(node, instance, r)
-    for node in con.floating_nodes:
-        find_instanced(node, instance, r)
+    q = deque(con.nodes)
+    while q:
+        con = q.popleft()
+        if con.window_instance == instance:
+            result.append(con)
+        q.extend(con.nodes)
+        q.extend(con.floating_nodes)
 
-    return r
+    return result
 
 def find(i3, name):
     tree = i3.get_tree()
