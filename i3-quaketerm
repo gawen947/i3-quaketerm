@@ -26,8 +26,9 @@ import getopt, sys, os
 import i3ipc
 
 # TODO:
+#  - extra arguments for terminal
+#  - trap signal stop when child returns
 #  - verbose
-#  - usage
 #  - show error details (for example when cannot start cmd)
 #  - page
 #  - report i3ipc bug
@@ -72,6 +73,19 @@ def find(i3, name):
 def version():
     print("i3-quaketerm v%s" % (VERSION,))
 
+def usage(name):
+    print("usage: %s [OPTIONS]" % (name,))
+    print("""
+  -h, --help        Show this help message
+  -V, --version     Show version information
+  -v, --verbose     Be more verbose
+  -H, --hidden      Hide terminal when created (default: false)
+  -t, --terminal    Terminal emulator to use (default: xterm)
+  -n, --name        Name of the terminal (WM_CLASS) (default: i3-quaketerm)
+  -N, --name-option Option used to change the name on terminal emulator (default: -name)
+  -p, --position    Position of the quaketerm (top or bottom, default: top)
+  -r, --ratio       Height over width ratio (default: 0.25)""")
+
 if __name__ == '__main__':
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hVHt:n:N:vp:r:", [ "help", "version", "hidden", "terminal", "name", "name-option", "verbose", "position", "ratio" ])
@@ -94,7 +108,7 @@ if __name__ == '__main__':
             version()
             sys.exit(0)
         elif o in ("-h", "--help"):
-            usage()
+            usage(sys.argv[0])
             sys.exit(0)
         elif o in ("-H", "--hidden"):
             hidden = True
