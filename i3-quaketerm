@@ -52,6 +52,12 @@ def hide(i3, name):
     i3.command("[instance=%s] floating enable, move scratchpad" % (name,))
 
 def find_instanced(con, instance, r = []):
+    """Find a container by instance.
+    The find_*() method from i3ipc did not return foating nodes
+    correctly. So we reimplemented it here.
+    """
+    # TODO: can fail with very deep trees
+    #       should use non-rec exploration instead.
     if con.window_instance == instance:
         r.append(con)
 
