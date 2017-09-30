@@ -30,10 +30,6 @@ import os
 
 import i3ipc
 
-# TODO:
-#  - page
-#  - report i3ipc bug
-
 VERSION="0.1-git"
 
 def show(i3, ws, name, position, ratio):
