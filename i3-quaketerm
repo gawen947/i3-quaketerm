@@ -31,7 +31,6 @@ import os
 import i3ipc
 
 # TODO:
-#  - verbose
 #  - show error details (for example when cannot start cmd)
 #  - page
 #  - report i3ipc bug
@@ -39,6 +38,8 @@ import i3ipc
 VERSION="0.1-git"
 
 def show(i3, ws, name, position, ratio):
+    verbose("show %s window" % (name,))
+
     x, y = ws["rect"]["x"], ws["rect"]["y"]
     w, h = ws["rect"]["width"], ws["rect"]["height"]
 
@@ -52,6 +53,7 @@ def show(i3, ws, name, position, ratio):
                "move absolute position %d px %d px" % (name, w, h, x, y))
 
 def hide(i3, name):
+    verbose("hide %s window" % (name,))
     i3.command("[instance=%s] floating enable, move scratchpad" % (name,))
 
 def find_instanced(con, instance, r = []):
@@ -107,7 +109,8 @@ if __name__ == '__main__':
         usage(sys.argv[0])
         sys.exit(1)
 
-    verbose       = False
+    global verbose
+    verbose       = lambda *a : None
     hidden        = False
     terminal      = "xterm"
     name          = "i3-quaketerm"
@@ -117,7 +120,7 @@ if __name__ == '__main__':
     ratio         = 0.25
     for o, a in opts:
         if o in ("-v", "--verbose"):
-            verbose = True
+            verbose = print
         elif o in ("-V", "--version"):
             version()
             sys.exit(0)
@@ -151,11 +154,15 @@ if __name__ == '__main__':
 
     term = find(i3, name)
     if term:
+        verbose("%s window found in tree" % (name,))
+
         hide(i3, name)
         if term.workspace().name != focused_ws.name:
             show(i3, focused_ws, name, position, ratio)
     else:
-        # Wait for the newly created to appear.
+        verbose("%s window not found, create it" % (name,))
+
+        # Wait for the newly created terminal to appear.
         def new_window(self, event):
             if event.container.window_instance == name:
                 hide(i3, name)
@@ -167,6 +174,7 @@ if __name__ == '__main__':
         # The child returning without a window appearing
         # means that an error occured.
         def sig_chld(signum, frame):
+            verbose("child returned without a window")
             sys.exit(1)
         signal.signal(signal.SIGCHLD, sig_chld)
 
