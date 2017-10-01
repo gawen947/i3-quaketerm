@@ -32,7 +32,7 @@ from collections import deque
 
 import i3ipc
 
-VERSION="0.1-git"
+VERSION="0.2-git"
 
 def show(i3, ws, name, position, ratio):
     verbose("show %s window" % (name,))
