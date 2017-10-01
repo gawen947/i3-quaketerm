@@ -52,7 +52,7 @@ bindsym F10 exec i3-quaketerm -n i3-python-quaketerm -e "bpython"
 ```
 
 Finally it is possible to integrate the drop-down terminal with other tools.
-For example, transparancy with compton compositor (in `compton.conf`).
+For example, transparency with compton compositor (in `compton.conf`).
 
 ```
 opacity-rule = [ "95:class_g='i3-quaketerm'" ];
