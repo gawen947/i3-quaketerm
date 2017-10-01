@@ -38,7 +38,7 @@ to create this terminal when i3 starts instead by using the `-H, --hidden`
 option. This will hide the terminal when it is first created.
 
 ```
-exec i3-quickterm -H
+exec i3-quaketerm -H
 ```
 
 It is also possible to add extra options to the terminal and to map alternative
