@@ -3,7 +3,7 @@
 A quake-like drop-down terminal for i3.
 Each call to the i3-quaketerm command will either:
   * Create a terminal and show it at the top or bottom of the focused workspace.
-  * Bring back the terminal to the focused worksace if hidden or on other workspace.
+  * Bring back the terminal to the focused workspace if hidden or on other workspace.
   * Hide the terminal into scratchpad if already visible on focused workspace.
 
 This was inspired by a similar drop-down terminal for AwesomeWM and [i3-quickterm](http://github.com/lbonn/i3-quickterm)
