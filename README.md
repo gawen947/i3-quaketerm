@@ -23,7 +23,7 @@ It is also recommended to pre-float the terminal window in i3 to avoid
 influence on other container when the terminal is created.
 
 ```
-for_window [instance="i3-quaketerm"] floating enable
+for_window [instance="i3-quaketerm"] border none floating enable
 bindsym F12 exec i3-quaketerm
 ```
 
