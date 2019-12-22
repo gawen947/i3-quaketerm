@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#  Copyright (c) 2017, David Hauweele <david@hauweele.net>
+#  Copyright (c) 2017-2020, David Hauweele <david@hauweele.net>
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
@@ -32,13 +32,13 @@ from collections import deque
 
 import i3ipc
 
-VERSION="0.3-git"
+VERSION="0.3.1-git"
 
 def show(i3, ws, name, position, w_ratio, h_ratio, offset):
     verbose("show %s window" % (name,))
 
-    x, y = ws["rect"]["x"], ws["rect"]["y"]
-    w, h = ws["rect"]["width"], ws["rect"]["height"]
+    x, y = ws.rect.x, ws.rect.y
+    w, h = ws.rect.width, ws.rect.height
 
     # TODO: Accept height, width, offset in both pixels or ratio.
 
@@ -180,7 +180,7 @@ if __name__ == '__main__':
             assert False, "unhandled option"
 
     i3 = i3ipc.Connection()
-    focused_ws = [w for w in i3.get_workspaces() if w["focused"]][0]
+    focused_ws = [w for w in i3.get_workspaces() if w.focused][0]
 
     term = find(i3, name)
     if term:
