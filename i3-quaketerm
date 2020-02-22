@@ -32,7 +32,7 @@ from collections import deque
 
 import i3ipc
 
-VERSION="0.3.1-git"
+VERSION="0.3.2-git"
 
 def show(i3, ws, name, position, w_ratio, h_ratio, offset):
     verbose("show %s window" % (name,))
@@ -60,6 +60,7 @@ def show(i3, ws, name, position, w_ratio, h_ratio, offset):
     w = w_
 
     i3.command("[instance=%s],"
+               "scratchpad show,"
                "resize set %d px %d px,"
                "move absolute position %d px %d px" % (name, w, h, x, y))
 
