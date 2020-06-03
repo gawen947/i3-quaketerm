@@ -53,7 +53,7 @@ def show(i3, ws, name, position, w_ratio, h_ratio, offset):
         y = y + offset
 
     # Horizontal position
-    x = (w - w_) / 2
+    x = x + (w - w_) / 2
 
     # Store final width and height
     h = h_
