@@ -97,4 +97,4 @@ bindsym F12 exec i3-quaketerm -W
 If you have any other cool idea about how to use this command, specific configuration
 for your own setup, own terminal, bug reports or any other improvement, feel free to
 send them as [issues](https://github.com/gawen947/i3-quaketerm/issues) or
-[pull requests](https://github.com/gawen947/pulls).
+[pull requests](https://github.com/gawen947/i3-quaketerm/pulls).
