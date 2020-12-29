@@ -109,13 +109,13 @@ def usage(name):
   -e, --extra-options Extra options passed to the terminal
   -p, --position      Position of the quaketerm (top or bottom, default: top)
   -o  --offset        Offset in pixels from top or bottom (see -p)
-  -h, --height        Height as a ratio of workspace height (default: 0.25)
+  -g  --height        Height as a ratio of workspace height (default: 0.25)
   -w, --width         Width as a ratio of workspace width (default: 1.00)""")
 
 if __name__ == '__main__':
     progname = os.path.basename(sys.argv[0])
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hVHt:n:N:e:vp:o:h:w:", [ "help", "version", "hidden",
+        opts, args = getopt.getopt(sys.argv[1:], "hVHt:n:N:e:vp:o:g:w:", [ "help", "version", "hidden",
                                                                            "terminal=", "name=", "name-option=",
                                                                            "extra-options=", "verbose", "position=",
                                                                            "offset=", "height=", "width=" ])
@@ -158,7 +158,7 @@ if __name__ == '__main__':
             position = a
             if position not in ("top", "bottom"):
                 sys.exit("error: invalid position (use top or bottom)")
-        elif o in ("-h", "--height"):
+        elif o in ("-g", "--height"):
             try:
                 h_ratio = float(a)
                 if h_ratio <= 0. or h_ratio > 1.:
