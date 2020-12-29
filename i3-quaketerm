@@ -32,9 +32,9 @@ from collections import deque
 
 import i3ipc
 
-VERSION="0.3.3-git"
+VERSION="0.4-git"
 
-def show(i3, ws, name, position, w_ratio, h_ratio, offset):
+def show(i3, ws, name, position, align, w_ratio, h_ratio, offset):
     verbose("show %s window" % (name,))
 
     x, y = ws.rect.x, ws.rect.y
@@ -53,7 +53,12 @@ def show(i3, ws, name, position, w_ratio, h_ratio, offset):
         y = y + offset
 
     # Horizontal position
-    x = x + (w - w_) / 2
+    if align == "center":
+        x = x + (w - w_) / 2
+    elif align == "left":
+        x = 0
+    elif align == "right":
+        x = w - w_
 
     # Store final width and height
     h = h_
@@ -108,6 +113,7 @@ def usage(name):
   -N, --name-options  Option used to change the name on terminal emulator (default: -name)
   -e, --extra-options Extra options passed to the terminal
   -p, --position      Position of the quaketerm (top or bottom, default: top)
+  -a, --align         Horizontal alignment (left, right or center, default: center)
   -o  --offset        Offset in pixels from top or bottom (see -p)
   -g  --height        Height as a ratio of workspace height (default: 0.25)
   -w, --width         Width as a ratio of workspace width (default: 1.00)""")
@@ -115,10 +121,10 @@ def usage(name):
 if __name__ == '__main__':
     progname = os.path.basename(sys.argv[0])
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hVHt:n:N:e:vp:o:g:w:", [ "help", "version", "hidden",
+        opts, args = getopt.getopt(sys.argv[1:], "hVHt:n:N:e:vp:a:o:g:w:", [ "help", "version", "hidden",
                                                                            "terminal=", "name=", "name-option=",
                                                                            "extra-options=", "verbose", "position=",
-                                                                           "offset=", "height=", "width=" ])
+                                                                           "align=", "offset=", "height=", "width=" ])
     except getopt.GetoptError as e:
         print(str(e))
         usage(progname)
@@ -132,6 +138,7 @@ if __name__ == '__main__':
     name_option   = "-name"
     extra_options = []
     position      = "top"
+    align         = "center"
     offset        = 0
     h_ratio       = 0.25
     w_ratio       = 1.00
@@ -158,6 +165,10 @@ if __name__ == '__main__':
             position = a
             if position not in ("top", "bottom"):
                 sys.exit("error: invalid position (use top or bottom)")
+        elif o in ("-a", "--align"):
+            align = a
+            if align not in ("left", "right", "center"):
+                sys.exit("error: invalid alignment (use left, right or center")
         elif o in ("-g", "--height"):
             try:
                 h_ratio = float(a)
@@ -189,7 +200,7 @@ if __name__ == '__main__':
 
         hide(i3, name)
         if term.workspace().name != focused_ws.name:
-            show(i3, focused_ws, name, position, w_ratio, h_ratio, offset)
+            show(i3, focused_ws, name, position, align, w_ratio, h_ratio, offset)
     else:
         verbose("%s window not found, create it" % (name,))
 
@@ -198,7 +209,7 @@ if __name__ == '__main__':
             if event.container.window_instance == name:
                 hide(i3, name)
                 if not hidden:
-                    show(i3, focused_ws, name, position, w_ratio, h_ratio, offset)
+                    show(i3, focused_ws, name, position, align, w_ratio, h_ratio, offset)
                 sys.exit(0)
         i3.on("window::new", new_window)
 
