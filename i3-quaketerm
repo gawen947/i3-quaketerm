@@ -111,6 +111,7 @@ def usage(name):
   -t, --terminal      Terminal emulator to use (default: xterm)
   -n, --name          Name of the terminal (WM_CLASS) (default: i3-quaketerm)
   -N, --name-option   Option used to change the name on terminal emulator (default: -name)
+  -W, --workspace     Append the workspace ID to the instance name, creating one instance per workspace.
   -e, --extra-options Extra options passed to the terminal
   -p, --position      Position of the quaketerm (top or bottom, default: top)
   -a, --align         Horizontal alignment (left, right or center, default: center)
@@ -121,10 +122,11 @@ def usage(name):
 if __name__ == '__main__':
     progname = os.path.basename(sys.argv[0])
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hVHt:n:N:e:vp:a:o:g:w:", [ "help", "version", "hidden",
-                                                                           "terminal=", "name=", "name-option=",
-                                                                           "extra-options=", "verbose", "position=",
-                                                                           "align=", "offset=", "height=", "width=" ])
+        opts, args = getopt.getopt(sys.argv[1:], "hVHt:n:N:We:vp:a:o:g:w:", [ "help", "version", "hidden",
+                                                                           "terminal=", "name=", "workspace",
+                                                                           "name-option=", "extra-options=", "verbose",
+                                                                           "position=", "align=", "offset=", "height=",
+                                                                           "width=" ])
     except getopt.GetoptError as e:
         print(str(e))
         usage(progname)
@@ -139,6 +141,7 @@ if __name__ == '__main__':
     extra_options = []
     position      = "top"
     align         = "center"
+    workspace     = False
     offset        = 0
     h_ratio       = 0.25
     w_ratio       = 1.00
@@ -159,6 +162,8 @@ if __name__ == '__main__':
             name = a
         elif o in ("-N", "--name-option"):
             name_option = a
+        elif o in ("-W", "--workspace"):
+            workspace = True
         elif o in ("-e", "--extra-options"):
             extra_options = shlex.split(a)
         elif o in ("-p", "--position"):
@@ -193,6 +198,17 @@ if __name__ == '__main__':
 
     i3 = i3ipc.Connection()
     focused_ws = [w for w in i3.get_workspaces() if w.focused][0]
+
+    if workspace:
+        # Prefer num to workspace name, if the workspace has been renamed.
+        # If the workspace has a name but no logical number, it probably
+        # means that its name won't change so much anyway.
+        if focused_ws.num != -1:
+            ws_id = str(focused_ws.num)
+        else:
+            ws_id = focused_ws.name
+
+        name += ":%s" % (ws_id,)
 
     term = find(i3, name)
     if term:

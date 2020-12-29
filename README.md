@@ -78,6 +78,20 @@ i3-quaketerm -n i3-right-term -a right --height 1.0 --width 0.45
 i3-quaketerm -n i3-left-term -a left --height 1.0 --width 0.45
 ```
 
+## One instance per workspace
+
+It is possible to create one instance of terminal per workspace instead of one common
+to all workspaces. To do so, use the `-W, --workspace` option. This will append
+`:{workspace-id}` to the instance name where `{workspace-id}` is either the logical
+number or if not available, the name of the currently focused workspace. Thus,
+it will automatically create a distinct instance name for each workspace. For example,
+the following i3 binding will create one drop-down terminal for each of your workspace,
+always accessible through the same key.
+
+```
+bindsym F12 exec i3-quaketerm -W
+```
+
 ## Other cool ideas
 
 If you have any other cool idea about how to use this command, specific configuration
