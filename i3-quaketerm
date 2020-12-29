@@ -110,7 +110,7 @@ def usage(name):
   -H, --hidden        Hide terminal when created (default: false)
   -t, --terminal      Terminal emulator to use (default: xterm)
   -n, --name          Name of the terminal (WM_CLASS) (default: i3-quaketerm)
-  -N, --name-options  Option used to change the name on terminal emulator (default: -name)
+  -N, --name-option   Option used to change the name on terminal emulator (default: -name)
   -e, --extra-options Extra options passed to the terminal
   -p, --position      Position of the quaketerm (top or bottom, default: top)
   -a, --align         Horizontal alignment (left, right or center, default: center)
